@@ -1,0 +1,22 @@
+[Unit]
+Description=PyRunner - Python Script Manager
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/pyrunner
+Environment="PATH=/home/pi/pyrunner/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+ExecStart=/home/pi/pyrunner/venv/bin/python /home/pi/pyrunner/app.py
+Restart=always
+RestartSec=5
+
+# Security settings
+NoNewPrivileges=false
+
+# Allow GPIO access
+SupplementaryGroups=gpio i2c spi
+
+[Install]
+WantedBy=multi-user.target

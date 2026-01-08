@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Tree Runner - {{ hostname }}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <!-- Christmas Tree -->
+                    <polygon points="12,3 6,10 8,10 5,15 8,15 4,21 20,21 16,15 19,15 16,10 18,10" fill="none"/>
+                    <line x1="12" y1="21" x2="12" y2="23" stroke-width="2"/>
+                    <!-- Star on top -->
+                    <polygon points="12,1 11.2,2.8 9.2,2.8 10.6,4 10.1,6 12,4.8 13.9,6 13.4,4 14.8,2.8 12.8,2.8" fill="currentColor" stroke="none"/>
+                    <!-- Ornaments -->
+                    <circle cx="10" cy="12" r="1" fill="currentColor"/>
+                    <circle cx="14" cy="14" r="1" fill="currentColor"/>
+                    <circle cx="9" cy="17" r="1" fill="currentColor"/>
+                    <circle cx="15" cy="18" r="1" fill="currentColor"/>
+                </svg>
+                <span>Python Tree Runner</span>
+            </div>
+        </div>
+        <div class="header-center">
+            <div class="hostname-badge">
+                <span class="hostname-dot"></span>
+                <span id="hostname">{{ hostname }}</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="status-indicator" id="connectionStatus">
+                <span class="status-dot disconnected"></span>
+                <span class="status-text">Disconnected</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <!-- Upload Zone (shown when not executing) -->
+        <section id="uploadSection" class="section upload-section">
+            <div class="upload-zone" id="uploadZone">
+                <div class="upload-icon">
+                    <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                </div>
+                <div class="upload-text">
+                    <p class="upload-primary">Drag & drop a Python file here</p>
+                    <p class="upload-secondary">or click to select</p>
+                </div>
+                <input type="file" id="fileInput" accept=".py" hidden>
+            </div>
+        </section>
+
+        <!-- Validation Results (shown after upload) -->
+        <section id="validationSection" class="section validation-section hidden">
+            <div class="validation-header">
+                <h2>Upload Results</h2>
+                <button class="btn btn-ghost" id="closeValidation">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="validation-content" id="validationContent">
+                <!-- Populated by JS -->
+            </div>
+        </section>
+
+        <!-- File Browser -->
+        <section id="browserSection" class="section browser-section">
+            <div class="section-header">
+                <h2>Scripts</h2>
+                <button class="btn btn-icon" id="refreshBtn" title="Refresh">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 4 23 10 17 10"/>
+                        <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="file-list" id="fileList">
+                <div class="loading">Loading scripts...</div>
+            </div>
+            <!-- External processes -->
+            <div id="externalSection" class="external-section hidden">
+                <h3>External Processes</h3>
+                <div class="external-list" id="externalList"></div>
+            </div>
+        </section>
+
+        <!-- Execution View -->
+        <section id="executionSection" class="section execution-section hidden">
+            <div class="execution-header">
+                <div class="execution-info">
+                    <h2 id="execScriptName">script.py</h2>
+                    <div class="execution-meta">
+                        <span class="runtime" id="execRuntime">00:00:00</span>
+                        <span class="pid" id="execPid">PID: -</span>
+                    </div>
+                </div>
+                <div class="execution-controls">
+                    <button class="btn btn-secondary" id="backToListBtn">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="15 18 9 12 15 6"/>
+                        </svg>
+                        Back
+                    </button>
+                    <button class="btn btn-danger" id="stopBtn">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="6" y="6" width="12" height="12" rx="1"/>
+                        </svg>
+                        Stop
+                    </button>
+                </div>
+            </div>
+            <div class="terminal" id="terminal">
+                <div class="terminal-output" id="terminalOutput"></div>
+                <div class="terminal-input-line">
+                    <span class="terminal-prompt">&gt;</span>
+                    <input type="text" class="terminal-input" id="terminalInput" placeholder="Type input here..." autocomplete="off">
+                </div>
+            </div>
+        </section>
+
+        <!-- Log Viewer -->
+        <section id="logSection" class="section log-section hidden">
+            <div class="log-header">
+                <h2>Execution Log: <span id="logScriptName">script.py</span></h2>
+                <button class="btn btn-ghost" id="closeLog">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <pre class="log-content" id="logContent"></pre>
+        </section>
+    </main>
+
+    <!-- Toast notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Confirmation Dialog -->
+    <div class="modal hidden" id="confirmModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <h3 id="confirmTitle">Confirm</h3>
+            <p id="confirmMessage">Are you sure?</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="confirmCancel">Cancel</button>
+                <button class="btn btn-danger" id="confirmOk">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>©2026 Pascal Harris</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

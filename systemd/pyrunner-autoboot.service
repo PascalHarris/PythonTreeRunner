@@ -1,0 +1,20 @@
+[Unit]
+Description=PyRunner Autoboot Script
+After=network.target pyrunner.service
+Wants=pyrunner.service
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/pythoncode
+Environment="PATH=/home/pi/pyrunner/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Environment="PYTHONUNBUFFERED=1"
+ExecStart=/home/pi/pyrunner/autoboot-runner.sh
+Restart=no
+
+# Allow GPIO access
+SupplementaryGroups=gpio i2c spi
+
+[Install]
+WantedBy=multi-user.target
