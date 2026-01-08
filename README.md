@@ -1,4 +1,4 @@
-# Christmas Tree Runner
+# Python Tree Runner
 
 A web-based Python script runner for the Raspberry Pi Christmas Tree. Upload, validate, execute, and manage your Christmas Tree (and other Python scripts) through a web interface.
 
@@ -18,7 +18,7 @@ A web-based Python script runner for the Raspberry Pi Christmas Tree. Upload, va
 
 ### Quick Install
 
-1. Copy the Christmas Tree Runner files to your Raspberry Pi
+1. Copy the Python Tree Runner files to your Raspberry Pi
 2. Run the installation script:
 
 ```bash
